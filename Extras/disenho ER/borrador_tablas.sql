@@ -1,0 +1,107 @@
+CREATE TABLE VEHICULOS(
+
+id_veh NUMBER PRIMARY KEY,
+id_cli NUMBER,
+vin VARCHAR2 (50) NOT NULL , 
+modelo NUMBER,
+tipo NUMBER,
+ubicacion VARCHAR2(50) NOT NULL,
+pais CHAR(2) NOT NULL,
+cilindraje NUMBER NOT NULL,
+transmision VARCHAR2 (25) NOT NULL,
+kilometraje NUMBER NOT NULL,
+descripcion VARCHAR2(200) NOT NULL,
+imgfrontal VARCHAR2(150)NOT NULL,
+imglatDer VARCHAR2(150) NOT NULL,
+imglatIzq VARCHAR2(150) NOT NULL,
+imgtras VARCHAR2(150) NOT NULL,
+imagint VARCHAR2(150) NOT NULL,
+imgmecanic VARCHAR2(150) NOT NULL,
+disp_vent BOOLEAN DEFAULT(TRUE),
+disp_rent BOOLEAN DEFAULT(TRUE),
+val_venta NUMBER NOT NULL,
+val_renta NUMBER NOT NULL,
+CONSTRAINT vin_unico UNIQUE (vin),
+CONSTRAINT veh_cli FOREIGN KEY (id_cli) REFERENCES USUARIOS(id_us),
+CONSTRAINT veh_mod FOREIGN KEY (modelo) REFERENCES MODELOS(id_mod)
+)
+
+CREATE TABLE MARCAS (
+id_mar NUMBER PRIMARY KEY,
+descripcion VARCHAR2(20) NOT NULL
+)
+
+CREATE TABLE MODELOS (
+id_mod NUMBER PRIMARY KEY,
+id_marc NUMBER,
+descripcion VARCHAR2(20) NOT NULL,
+CONSTRAINT mar_mod_fk FOREIGN KEY (id_marc) REFERENCES MARCAS(id_mar)
+);
+
+CREATE TABLE MEMBRESIAS(
+NUMBER id_memb PRIMARY KEY,
+titular NUMBER,
+fechaContrato DATE DEFAULT (),
+tipo NUMBER NOT NULL
+);
+
+CREATE TABLE SUBASTAS (
+id_sub NUMBER PRIMARY KEY,
+titulo VARCHAR2(50),
+inicio DATE,
+final DATE
+);
+
+CREATE TABLE SUB_ITEMS(
+item_id NUMBER PRIMARY KEY,
+subasta NUMBER,
+vehiculo NUMBER,
+valor_ini NUMBER NOT NULL,
+valor_fin NUMBER NULL,
+CONSTRAINT item_sub_fk FOREIGN KEY (subasta) REFERENCES SUBASTAS(id_sub),
+CONSTRAINT itemsub_veh_fk FOREIGN KEY (vehiculo) REFERENCES VEHICULOS(id_veh)
+);
+
+CREATE TABLE FACTURAS(
+id_fact NUMBER PRIMARY KEY,
+rtn_emisor NUMBER NOT NULL,
+cliente_id NUMBER,
+fecha DATE NOT NULL,
+multa NUMBER DEFAULT 0,
+descuento NUMBER DEFAULT 0,
+servicio NUMBER NOT NULL,
+detalle  VARCHAR2(200),
+sub_total NUMBER(8,2),
+total NUMBER(8,2),
+CONSTRAINT fact_cli_fk FOREIGN KEY(cliente_id) REFERENCES USUARIOS(id_us)
+);
+
+CREATE TABLE PROGRAMACIONES(
+id_cita NUMBER PRIMARY KEY,
+client_id NUMBER,
+proveedor NUMBER,
+fecha DATE NOT NULL,
+detalle VARCHAR2(200) NOT NULL,
+total NUMBER(8,2),
+factura NUMBER,
+CONSTRAINT prog_cli_fk FOREIGN KEY(client_id) REFERENCES USUARIOS(id_us),
+CONSTRAINT prog_prov_fk FOREIGN KEY(proveedor) REFERENCES USUARIOS(id_us),
+CONSTRAINT prog_fact_fk FOREIGN KEY(factura) REFERENCES FACTURAS(id_fact)
+);
+
+CREATE TABLE RENTADOS(
+id_rent NUMBER PRIMARY KEY,
+proveedor_id NUMBER,
+client NUMBER,
+vehiculo_id NUMBER,
+factura_id NUMBER,
+desde DATE NOT NULL,
+hasta DATE NOT NULL,
+modalidad VARCHAR2(10) NOT NULL,
+observaciones  VARCHAR2(200) NOT NULL,
+valor NUMBER(8,2)
+CONSTRAINT ren_prov_fk FOREIGN KEY(proveedor_id) REFERENCES USUARIOS(id_us),
+CONSTRAINT ren_cli_fk FOREIGN KEY(client) REFERENCES USUARIOS(id_us),
+CONSTRAINT ren_veh_fk FOREIGN KEY (vehiculo_id) REFERENCES VEHICULOS(id_veh),
+CONSTRAINT ren_fact_fk FOREIGN KEY(factura_id) REFERENCES FACTURAS(id_fact)
+);
